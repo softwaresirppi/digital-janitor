@@ -1,26 +1,24 @@
 import glob
 import os
 import sys
+import re
 
-# Plan for config syntax,
-# PATTERN [if COND] | ACTION
-# ACTION > move = copy
+# glob, glob, glob if pred do action
 
-def fileName(path):
-    return path.split('/')[-1]
-
-def interpret(line):
-    tokens = line.split('>');
-    pattern = tokens[0].strip();
-    action = tokens[1].strip();
-    print(pattern)
-    print(action)
+def cmd(line):
+    parts = re.split(r'\s+IF|DO\s+', line)
+    pattern = parts[0]
+    predicate = parts[1]
+    action = parts[2]
     for f in glob.glob(pattern):
-        print(f)
-        print(action + fileName(f))
-        os.renames(f, action + fileName(f))
+        stat = os.stat(f)
+        global size
+        size = stat.st_size # in bytes
+        global extension
+        extension = f.split('.')[-1]
+        if eval(predicate, globals()) == True:
+            print('PROCESSING ', f)
+            exec(action)
 
-with open(sys.argv[1], 'r') as script:
-    for line in script.readlines():
-        print(line)
-        interpret(line)
+
+cmd('/home/crayonie/notebook/* IF size < 800 DO print("found")')

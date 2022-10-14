@@ -4,6 +4,7 @@ import sys
 import re
 import mimetypes
 import time
+import shutil
 
 # glob, glob, glob if pred do action
 def move(f, t):
@@ -33,7 +34,7 @@ def cmd(line):
         global size
         size = stat.st_size # in bytes
         global name
-        name = re.split("/", path)[-1]
+        name = re.split(r"\\|/", path)[-1]
         global extension
         extension = path.split('.')[-1]
         global mimetype
@@ -46,4 +47,4 @@ def cmd(line):
             print('PROCESSING ', path)
             exec(action)
 
-cmd('/home/crayonie/*.class IF True DO delete(path)')
+cmd('/home/crayonie/*.java IF True DO copy(path, "/home/crayonie/garbage/" + name)')

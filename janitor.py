@@ -6,6 +6,15 @@ import mimetypes
 import time
 
 # glob, glob, glob if pred do action
+def move(f, t):
+    os.renames(f, t)
+
+def copy(f, t):
+    shutil.copy(f, t)
+
+def delete(f):
+    os.remove(f)
+    
 
 def cmd(line):
     parts = re.split(r'\s+IF|DO\s+', line)
@@ -37,4 +46,4 @@ def cmd(line):
             print('PROCESSING ', path)
             exec(action)
 
-cmd('/home/crayonie/* IF lastaccess < 1 HR DO print("FOUND")')
+cmd('/home/crayonie/*.class IF True DO delete(path)')

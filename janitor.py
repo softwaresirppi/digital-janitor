@@ -1,3 +1,4 @@
+#!/bin/python3
 import glob
 import os
 import sys
@@ -5,17 +6,30 @@ import re
 import mimetypes
 import time
 import shutil
+import platform
 
+system = platform.platform()
+if 'win' in system:
+    filedelimiter = "\\"
+else:
+    filedelimiter = "/"
+print(filedelimiter)
 # glob, glob, glob if pred do action
 def move(f, t):
     os.renames(f, t)
 
 def copy(f, t):
+    pathEntities = t.split(filedelimiter)
+    parent = filedelimiter.join(pathEntities[0:len(pathEntities) - 1])
+    print(parent)
+    try:
+        os.makedirs(parent)
+    except FileExistsError:
+        pass
     shutil.copy(f, t)
 
 def delete(f):
     os.remove(f)
-    
 
 def cmd(line):
     parts = re.split(r'\s+IF|DO\s+', line)
@@ -34,7 +48,7 @@ def cmd(line):
         global size
         size = stat.st_size # in bytes
         global name
-        name = re.split(r"\\|/", path)[-1]
+        name = path.split(filedelimiter)[-1]
         global extension
         extension = path.split('.')[-1]
         global mimetype
@@ -47,4 +61,9 @@ def cmd(line):
             print('PROCESSING ', path)
             exec(action)
 
-cmd('/home/crayonie/*.java IF True DO copy(path, "/home/crayonie/garbage/" + name)')
+if len(sys.argv) < 2:
+    print("No script file is given")
+    exit(0)
+with open(sys.argv[1]) as f:
+    for line in f:
+        cmd(line)

@@ -22,6 +22,8 @@ pattern IF condition DO action
    - path
    - size
    - name
+   - parent
+   - folder (current working directory)
    - extension
    - mimetype
    - accessed (time elapsed from latest access)
@@ -30,15 +32,16 @@ pattern IF condition DO action
    - Move
    - Copy
    - Delete
+ - Script mode and command mode
 
 # Feature Roadmap
 ## POC 2
- - Many patterns, optional IF
- - Command line mode
- - Add current, home, parent predef variable
  - Sugar coat for operators and functions (X in Y, X like Y)
  - Prompting
+ - Help menu
+ - Better cui support
 
+ - Rewrite whole shit
  - Safe moving
  - Tagging system
  - Handle links

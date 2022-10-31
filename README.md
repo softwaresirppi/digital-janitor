@@ -36,15 +36,15 @@ pattern IF condition DO action
 
 # Feature Roadmap
 ## POC 2
- - Sugar coat for operators and functions (X in Y, X like Y)
- - Prompting
  - Help menu
  - Better cui support
 
  - Rewrite whole shit
+ - Error handling
  - Safe moving
  - Tagging system
- - Handle links
+ - Handle links and folders
  - Full text searching
  - Enhanced datetime support (with today)
  - Duplicate detection
+ - Bulk Rename

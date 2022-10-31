@@ -81,6 +81,14 @@ def cmd(line):
     predicate = predicate.replace('MIN', '* 60')
     predicate = predicate.replace('HR', '* 3600')
     predicate = predicate.replace('DAY', '* 86400')
+    action = re.sub('^alert\s+delete$', 'delete(path, True)', action)
+    action = re.sub('^delete$', 'delete(path)', action)
+    action = re.sub('^alert\s+move\s+to\s+(.*)$', 'move(path, \'\\1\' + filedelimiter + name, True)', action)
+    action = re.sub('^move\s+to\s+(.*)$', 'move(path, \'\\1\' + filedelimiter + name)', action)
+    action = re.sub('^alert\s+copy\s+to\s+(.*)$', 'copy(path, \'\\1\' + filedelimiter + name, True)', action)
+    action = re.sub('^copy\s+to\s+(.*)$', 'copy(path, \'\\1\' + filedelimiter + name)', action)
+    print(predicate)
+    print(action)
     # actions!
     global path
     for path in glob.glob(pattern, recursive = True):

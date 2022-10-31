@@ -14,6 +14,8 @@ Copy the files modified before 12 hours to recents folder
 /home/crayonie/* IF modified < 12 HR DO copy(path, '/home/crayonie/recents/' + name)
 ```
 
+# SYNTAX
+pattern IF condition DO action
 
 # Features
  - Predicates
@@ -22,21 +24,24 @@ Copy the files modified before 12 hours to recents folder
    - name
    - extension
    - mimetype
-   - accessed
-   - modified
+   - accessed (time elapsed from latest access)
+   - modified (time elapsed from latest modification)
  - Actions
    - Move
    - Copy
    - Delete
 
 # Feature Roadmap
- - Add parent predef variable
+## POC 2
+ - Many patterns, optional IF
+ - Command line mode
+ - Add current, home, parent predef variable
+ - Sugar coat for operators and functions (X in Y, X like Y)
+ - Prompting
+
  - Safe moving
  - Tagging system
- - Prompting
  - Handle links
- - Sugar coat for operators and functions (X in Y, X like Y)
  - Full text searching
- - Many patterns, optional IF
  - Enhanced datetime support (with today)
  - Duplicate detection

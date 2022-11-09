@@ -12,36 +12,30 @@ system = platform.platform()
 if 'win' in system:
     filedelimiter = "\\"
 else:
+    opener = 'xdg-open'
     filedelimiter = "/"
 
 # glob, glob, glob if pred do action
-def move(f, t, doPrompt = False):
-    if doPrompt:
-        if not prompt(f):
-            return
+def move(f, t):
     os.renames(f, t)
 
-def copy(f, t, doPrompt = False):
-    if doPrompt:
-        if not prompt(f):
-            return
+def copy(f, t):
     pathEntities = t.split(filedelimiter)
     parent = filedelimiter.join(pathEntities[0:len(pathEntities) - 1])
-    print(parent)
     try:
         os.makedirs(parent)
     except FileExistsError:
         pass
     shutil.copy(f, t)
 
-def delete(f, doPrompt = False):
-    if doPrompt:
-        if not prompt(f):
-            return
+def delete(f):
     os.remove(f)
 
-def prompt(f):
-    print(f + ": Are you sure? (y/n)")
+def prompt(f, preview = False):
+    # not cross platform
+    if preview:
+        os.system(opener + ' ' + f)
+    print(f + ": Are you sure? (y/n)", end = '')
     reply = input().lower()
     if reply == 'y':
         return True
@@ -63,7 +57,8 @@ def cmd(line):
     # change directory
     if 'DO' not in line:
         os.chdir(line)
-        folder = line
+        folder = os.getcwd()
+        print(folder)
         return
     # parsing
     pattern, predicate, action = parse(line)
@@ -81,14 +76,23 @@ def cmd(line):
     predicate = predicate.replace('MIN', '* 60')
     predicate = predicate.replace('HR', '* 3600')
     predicate = predicate.replace('DAY', '* 86400')
-    action = re.sub('^alert\s+delete$', 'delete(path, True)', action)
+    action = re.sub('^preview\s+print$', 'print(path) if prompt(path, True) else None', action)
+    action = re.sub('^alert\s+print$', 'print(path) if prompt(path) else None', action)
+    action = re.sub('^print$', 'print(path)', action)
+
+    action = re.sub('^preview\s+delete$', 'delete(path) if prompt(path, True) else None', action)
+    action = re.sub('^alert\s+delete$', 'delete(path) if prompt(path) else None', action)
     action = re.sub('^delete$', 'delete(path)', action)
-    action = re.sub('^alert\s+move\s+to\s+(.*)$', 'move(path, \'\\1\' + filedelimiter + name, True)', action)
+
+    action = re.sub('^preview\s+move\s+to\s+(.*)$', 'move(path, \'\\1\' + filedelimiter + name) if prompt(path, True) else None', action)
+    action = re.sub('^alert\s+move\s+to\s+(.*)$', 'move(path, \'\\1\' + filedelimiter + name) if prompt(path) else None', action)
     action = re.sub('^move\s+to\s+(.*)$', 'move(path, \'\\1\' + filedelimiter + name)', action)
-    action = re.sub('^alert\s+copy\s+to\s+(.*)$', 'copy(path, \'\\1\' + filedelimiter + name, True)', action)
+
+    action = re.sub('^preview\s+copy\s+to\s+(.*)$', 'copy(path, \'\\1\' + filedelimiter + name) if prompt(path, True) else None', action)
+    action = re.sub('^alert\s+copy\s+to\s+(.*)$', 'copy(path, \'\\1\' + filedelimiter + name) if prompt(path) else None', action)
     action = re.sub('^copy\s+to\s+(.*)$', 'copy(path, \'\\1\' + filedelimiter + name)', action)
-    print(predicate)
-    print(action)
+    #print(predicate)
+    #print(action)
     # actions!
     global path
     for path in glob.glob(pattern, recursive = True):

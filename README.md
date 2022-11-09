@@ -2,29 +2,47 @@ An automatic file organizer which organizes the files according to the rules set
 
 # Examples
 ```
-Delete all compiled .class files
-/home/crayonie/*.class DO delete(path)
-Move all c files to c_programs directory
-/home/crayonie/*.c DO move(path, '/home/crayonie/c_programs/' + name)
-Prompt and delete the files bigger than 1 GB
-/home/crayonie/* IF size > 1 GB DO delete(path, True)
-Copy the files accessed before half an hour to recents folder
-/home/crayonie/* IF accessed < 30 MIN DO copy(path, '/home/crayonie/recents/' + name)
-Copy the files modified before 12 hours to recents folder
-/home/crayonie/* IF modified < 12 HR DO copy(path, '/home/crayonie/recents/' + name)
+classify based on extensions
+	*.py DO move to scripts
+	*.txt DO copy to notes
+
+classify based on type(overall system)
+	** IF 'image' in mimetype DO copy to pics
+
+delete temporary files(overall system)
+	**/*~ DO delete
+
+Searching Big/Small file(overall system)
+	** IF size > 1 GB DO alert delete
+
+Recently used files
+	** IF accessed < 1 DAY DO alert delete
+
+Searching a file
+	**/thing.c DO print
+
+Searching inside file names
+	**/*file* DO print
+
+Processing all images (jpg, png, jpeg)
+	** IF 'image' in mimetype DO print
 ```
 
 # SYNTAX
-pattern IF condition DO action
+pattern? [IF condition?] DO action?
+
+pattern: any valid unix globs
+condition: any valid python expression (it has access to predefined variables)
+action: (preview | alert) (copy to location | move to location | delete | print)
 
 # Features
- - Predicates
+ - Predefined
    - path
    - size
+   - extension
    - name
    - parent
    - folder (current working directory)
-   - extension
    - mimetype
    - accessed (time elapsed from latest access)
    - modified (time elapsed from latest modification)
@@ -39,6 +57,7 @@ pattern IF condition DO action
  - Help menu
  - Better cui support
 
+ - Preview support
  - Rewrite whole shit
  - Error handling
  - Safe moving

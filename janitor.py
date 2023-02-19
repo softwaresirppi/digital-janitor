@@ -7,6 +7,8 @@ import mimetypes
 import time
 import shutil
 import platform
+from tkinter import *
+
 
 system = platform.platform()
 if 'win' in system:
@@ -118,6 +120,21 @@ def cmd(line):
                 #print('PROCESSING ', path)
                 exec(action)
 
+def gui():
+    window = Tk()
+    window.title('Stupid File Manager')
+
+    Label(window, text= 'file name', bg = 'black', fg = 'white' ).grid(row=0, column=0)
+    fileName = Entry(window, width= 20, bg = 'black', fg = 'white')
+    fileName.grid(row=0, column=1)
+
+    Label(window, text= 'destination', bg = 'black', fg = 'white' ).grid(row=1, column=0)
+    dest = Entry(window, width= 20, bg = 'black', fg = 'white' )
+    dest.grid(row=1, column=1)
+    Button(window, text='MOVE',  width = 8, command=lambda : cmd(f"{fileName.get()} DO move to {dest.get()}")).grid(row=2, column=0)
+    Button(window, text='COPY',  width = 8, command=lambda : cmd(f"{fileName.get()} DO copy to {dest.get()}")).grid(row=2, column=1)
+    Button(window, text='DELETE',  width = 8, command=lambda : cmd(f"{fileName.get()} DO delete")).grid(row=2, column=2)
+    window.mainloop()
 # MAIN
 if len(sys.argv) < 2:
     command = ''
@@ -128,6 +145,8 @@ if len(sys.argv) < 2:
             print('\x1b[0;33m', end='');
             command = input().strip();
             print('\x1b[0m', end='');
+elif sys.argv[1] == 'gui':
+    gui()
 else:
     with open(sys.argv[1]) as f:
         for line in f:

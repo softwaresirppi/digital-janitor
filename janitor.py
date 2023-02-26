@@ -8,7 +8,7 @@ import time
 import shutil
 import platform
 from tkinter import *
-
+from pathlib import Path
 
 system = platform.platform()
 if 'win' in system:
@@ -55,6 +55,7 @@ def parse(source):
 
 folder = os.getcwd()
 def cmd(line):
+    paths = []
     global folder
     # change directory
     if 'DO' not in line:
@@ -93,9 +94,6 @@ def cmd(line):
     action = re.sub('^preview\s+copy\s+to\s+(.*)$', 'copy(path, \'\\1\' + filedelimiter + name) if prompt(path, True) else None', action)
     action = re.sub('^alert\s+copy\s+to\s+(.*)$', 'copy(path, \'\\1\' + filedelimiter + name) if prompt(path) else None', action)
     action = re.sub('^copy\s+to\s+(.*)$', 'copy(path, \'\\1\' + filedelimiter + name)', action)
-    #print(predicate)
-    #print(action)
-    # actions!
     global path
     for path in glob.glob(pattern, recursive = True):
         if os.path.isfile(path):
@@ -117,23 +115,34 @@ def cmd(line):
             global modified
             modified = time.time() - stat.st_mtime
             if eval(predicate, globals()) == True:
-                #print('PROCESSING ', path)
+                paths.append(path)
                 exec(action)
+    return paths
 
 def gui():
     window = Tk()
-    window.title('Stupid File Manager')
-
-    Label(window, text= 'file name', bg = 'black', fg = 'white' ).grid(row=0, column=0)
-    fileName = Entry(window, width= 20, bg = 'black', fg = 'white')
-    fileName.grid(row=0, column=1)
-
-    Label(window, text= 'destination', bg = 'black', fg = 'white' ).grid(row=1, column=0)
-    dest = Entry(window, width= 20, bg = 'black', fg = 'white' )
-    dest.grid(row=1, column=1)
-    Button(window, text='MOVE',  width = 8, command=lambda : cmd(f"{fileName.get()} DO move to {dest.get()}")).grid(row=2, column=0)
-    Button(window, text='COPY',  width = 8, command=lambda : cmd(f"{fileName.get()} DO copy to {dest.get()}")).grid(row=2, column=1)
-    Button(window, text='DELETE',  width = 8, command=lambda : cmd(f"{fileName.get()} DO delete")).grid(row=2, column=2)
+    window.title('Automatic file organizer')
+    window.resizable(False, False)
+    Label(window, text= 'Files',  fg = 'white' ).grid(row=0, column=0)
+    fileName = Entry(window, width= 40, bg = 'black', fg = 'white')
+    fileName.grid(row=0, column=1, columnspan=4)
+    Label(window, text= 'Condition',  fg = 'white' ).grid(row=1, column=0)
+    condition = Entry(window, width= 40, bg = 'black', fg = 'white')
+    condition.grid(row=1, column=1, columnspan=4)
+    Label(window, text= 'Destination (?)', fg = 'white' ).grid(row=2, column=0)
+    dest = Entry(window, width= 40, bg = 'black', fg = 'white' )
+    dest.grid(row=2, column=1, columnspan=4)
+    Button(window, text='MOVE', command=lambda : cmd(f"{fileName.get()} {'' if condition.get() == ''  else 'IF'} {condition.get()} DO move to {dest.get()}")).grid(row=3, column=0)
+    Button(window, text='COPY', command=lambda : cmd(f"{fileName.get()} {'' if condition.get() == ''  else 'IF'} {condition.get()} DO copy to {dest.get()}")).grid(row=3, column=1)
+    Button(window, text='TRASH', command=lambda : cmd(f"{fileName.get()} {'' if condition.get() == ''  else 'IF'} {condition.get()} DO move to {Path.home()}/trash")).grid(row=3, column=3)
+    Button(window, text='DELETE', command=lambda : cmd(f"{fileName.get()} {'' if condition.get() == ''  else 'IF'} {condition.get()} DO delete")).grid(row=3, column=4)
+    box = Listbox(window, width=70, height=32)
+    box.grid(row=4, columnspan=5)
+    def view():
+        box.delete(0, END)
+        for file in cmd(f'{fileName.get()} DO None'):
+            box.insert(END, file)
+    Button(window, text='VIEW', command=view).grid(row=3, column=0, columnspan=5)
     window.mainloop()
 # MAIN
 if len(sys.argv) < 2:
